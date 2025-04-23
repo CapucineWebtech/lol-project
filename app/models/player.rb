@@ -1,8 +1,19 @@
 class Player < ApplicationRecord
   belongs_to :team, optional: true
 
+  VALID_ROLES = ['Top laner', 'Jungler', 'Mid laner', 'ADC', 'Support']
+
+  validates :first_name, presence: true
+  validates :last_name, presence: true
+  validates :role, presence: true, inclusion: { in: VALID_ROLES,
+                                                message: "must be one of: #{VALID_ROLES.join(', ')}" }
+
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
   def matches
-    team&.matches
+    team&.matches || []
   end
 
   def scores
@@ -13,6 +24,11 @@ class Player < ApplicationRecord
       else
         match.score_team2
       end
-    end
+    end.compact
+  end
+
+  def win_count
+    return 0 unless team
+    team.matches.count { |match| match.winner == team }
   end
 end

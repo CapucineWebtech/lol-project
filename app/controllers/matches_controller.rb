@@ -3,7 +3,7 @@ class MatchesController < ApplicationController
 
   # GET /matches or /matches.json
   def index
-    @matches = Match.all
+    @matches = Match.all.order(match_date: :desc)
   end
 
   # GET /matches/1 or /matches/1.json
@@ -13,10 +13,12 @@ class MatchesController < ApplicationController
   # GET /matches/new
   def new
     @match = Match.new
+    @teams = Team.all
   end
 
   # GET /matches/1/edit
   def edit
+    @teams = Team.all
   end
 
   # POST /matches or /matches.json
@@ -28,6 +30,7 @@ class MatchesController < ApplicationController
         format.html { redirect_to @match, notice: "Match was successfully created." }
         format.json { render :show, status: :created, location: @match }
       else
+        @teams = Team.all
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @match.errors, status: :unprocessable_entity }
       end
@@ -41,6 +44,7 @@ class MatchesController < ApplicationController
         format.html { redirect_to @match, notice: "Match was successfully updated." }
         format.json { render :show, status: :ok, location: @match }
       else
+        @teams = Team.all
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @match.errors, status: :unprocessable_entity }
       end
@@ -65,6 +69,6 @@ class MatchesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def match_params
-      params.require(:match).permit(:team1_id, :team2_id, :match_date, :score)
+      params.require(:match).permit(:team1_id, :team2_id, :match_date, :score_team1, :score_team2)
     end
 end
