@@ -1,0 +1,53 @@
+<div class="w-full flex justify-center">
+  <div class="w-full max-w-md mx-auto bg-white p-8 rounded-lg shadow-sm">
+    <h1 class="text-2xl font-bold text-center mb-6">Connexion</h1>
+
+    <% if flash[:alert] %>
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-medium">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <%= form_with url: login_path, method: :post, local: true, class: "contents" do |form| %>
+
+      <div class="mb-4">
+        <%= form.email_field :email, placeholder: "Adresse email", class: "block w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+      </div>
+
+      <div class="mb-6 relative">
+        <%= form.password_field :password, id: "login_password", placeholder: "Mot de passe", class: "block w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" %>
+        <button type="button" onclick="togglePassword('login_password', this)" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 focus:outline-none">
+          <svg class="h-5 w-5 eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <%= form.submit "Se connecter", class: "w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold rounded-md cursor-pointer text-lg" %>
+      </div>
+
+      <p class="text-center text-sm mt-2 text-gray-500">
+        Pas encore de compte ?
+        <%= link_to "Créer un compte", new_user_path, class: "text-blue-600 hover:underline font-medium" %>
+      </p>
+
+
+    <% end %>
+  </div>
+</div>
+
+<script>
+  function togglePassword(fieldId, button) {
+    const field = document.getElementById(fieldId);
+    const icon = button.querySelector("svg");
+    if (field.type === "password") {
+      field.type = "text";
+      icon.classList.add("text-blue-500");
+    } else {
+      field.type = "password";
+      icon.classList.remove("text-blue-500");
+    }
+  }
+</script>

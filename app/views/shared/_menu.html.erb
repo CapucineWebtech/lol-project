@@ -1,0 +1,19 @@
+<header class="bg-blue-500 text-white py-4 shadow">
+  <div class="container mx-auto px-5 flex justify-between items-center">
+    <!-- Gauche : Home -->
+    <div>
+      <%= link_to "Home", root_path, class: "font-semibold no-underline hover:text-gray-200" %>
+    </div>
+
+    <!-- Droite : autres liens -->
+    <div class="space-x-4">
+      <%= link_to "Tous les matchs", matches_path, class: "font-medium no-underline hover:text-gray-200" %>
+
+      <% if current_user %>
+        <%= link_to "Mon profil", user_path(current_user), class: "font-medium no-underline hover:text-gray-200" %>
+      <% else %>
+        <%= link_to "Se connecter", login_path, class: "font-medium no-underline hover:text-gray-200" %>
+      <% end %>
+    </div>
+  </div>
+</header>
