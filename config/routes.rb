@@ -22,6 +22,13 @@ Rails.application.routes.draw do
     patch 'update_result', on: :member
   end
 
+  # Resources for user management
+  resources :users do
+    member do
+      patch :toggle_admin
+    end
+  end  
+
   # Dashboard route for admins
   get 'dashboard', to: 'dashboard#index'
 

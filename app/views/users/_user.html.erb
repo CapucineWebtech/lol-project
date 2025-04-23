@@ -3,12 +3,10 @@
     <strong class="block font-medium mb-1">Email:</strong>
     <%= user.email %>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Password digest:</strong>
-    <%= user.password_digest %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Is admin:</strong>
-    <%= user.is_admin? ? "Yes" : "No" %>
-  </div>
+  <% if admin? %>
+    <div>
+      <strong class="block font-medium mb-1">Admin :</strong>
+      <%= user.is_admin? ? "Oui" : "Non" %>
+    </div>
+  <% end %>
 </div>

@@ -1,5 +1,8 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[ show edit update destroy ]
+  before_action :require_login, except: %i[new create]
+  before_action :require_admin, only: %i[index]
+  before_action :require_self_or_admin, only: [:show, :edit, :update, :destroy]
 
   # GET /users or /users.json
   def index
@@ -22,10 +25,10 @@ class UsersController < ApplicationController
   # POST /users or /users.json
   def create
     @user = User.new(user_params)
-    @user.is_admin = false
 
     respond_to do |format|
       if @user.save
+        session[:user_id] = @user.id unless logged_in?
         format.html { redirect_to @user, notice: "User was successfully created." }
         format.json { render :show, status: :created, location: @user }
       else
@@ -58,6 +61,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def toggle_admin
+    user = User.find(params[:id])
+    authorize_admin_action(user)
+  
+    if user == current_user
+      redirect_to users_path, alert: "Vous ne pouvez pas modifier votre propre statut admin."
+      return
+    end
+  
+    user.update(is_admin: !user.is_admin?)
+    redirect_to users_path
+  end  
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
@@ -66,6 +82,20 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:email, :password, :password_confirmation)
-    end    
+      allowed = [:email, :password, :password_confirmation]
+      allowed << :is_admin if admin?
+      params.require(:user).permit(*allowed)
+    end
+
+    def require_self_or_admin
+      unless current_user == @user || admin?
+        redirect_to root_path, alert: "Vous n'avez pas accès à cette partie du site."
+      end
+    end
+
+    def authorize_admin_action(user)
+      unless admin?
+        redirect_to root_path, alert: "Vous n'avez pas accès à cette action."
+      end
+    end
 end

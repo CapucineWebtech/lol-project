@@ -1,29 +1,46 @@
-<% content_for :title, "Users" %>
+<% content_for :title, "Liste des utilisateurs" %>
 
-<div class="w-full">
+<div class="w-full max-w-4xl mx-auto mt-10 space-y-6">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 text-green-600 font-medium rounded-md inline-block">
+      <%= notice %>
+    </p>
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Users</h1>
-    <%= link_to "New user", new_user_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="text-3xl font-bold">Liste des utilisateurs</h1>
+    <%= link_to "Ajouter un utilisateur", new_user_path, class: "rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
   </div>
 
-  <div id="users" class="min-w-full divide-y divide-gray-200 space-y-5">
+  <div class="bg-white shadow-sm rounded-lg divide-y divide-gray-200">
     <% if @users.any? %>
       <% @users.each do |user| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render user %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", user, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_user_path(user), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", user, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+        <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-4">
+          <div class="w-full sm:w-auto text-center sm:text-left">
+            <p class="text-lg font-medium text-gray-800"><%= user.email %></p>
+            <div class="flex items-center gap-2 mt-1 text-sm text-gray-500">
+              <span class="font-medium">Admin :</span>
+              <%= form_with url: toggle_admin_user_path(user), method: :patch, class: "inline" do %>
+                <label class="inline-flex relative items-center cursor-pointer">
+                  <input type="checkbox"
+                         onchange="this.form.submit()"
+                         <%= "checked" if user.is_admin? %>
+                         <%= "disabled" if user == current_user %>
+                         class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-checked:bg-green-500 rounded-full peer relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                </label>
+              <% end %>              
+            </div>
+          </div>
+
+          <div class="mt-4 sm:mt-0 flex gap-2">
+            <%= link_to "Modifier", edit_user_path(user), class: "px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 font-medium" %>
+            <%= button_to "Supprimer", user, method: :delete, class: "px-4 py-2 rounded-md text-white bg-red-600 hover:bg-red-500 font-medium", data: { turbo_confirm: "Supprimer cet utilisateur ?" } %>
           </div>
         </div>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No users found.</p>
+      <p class="text-center text-gray-500 py-6">Aucun utilisateur trouvé.</p>
     <% end %>
   </div>
 </div>
