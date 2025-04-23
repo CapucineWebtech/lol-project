@@ -1,0 +1,100 @@
+<div class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-blue-800 mb-8">League of Legends Tournament Manager</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Recent Matches Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Recent Matches</h2>
+
+        <% if @recent_matches.any? %>
+          <div class="space-y-4">
+            <% @recent_matches.each do |match| %>
+              <div class="border border-gray-200 rounded-md p-4 hover:bg-gray-50">
+                <div class="flex justify-between items-center">
+                  <div class="font-medium"><%= match.team1.name %></div>
+                  <div class="text-sm text-gray-500">vs</div>
+                  <div class="font-medium"><%= match.team2.name %></div>
+                </div>
+
+                <% if match.score_team1 && match.score_team2 %>
+                  <div class="flex justify-between items-center mt-2">
+                    <div class="text-xl font-bold"><%= match.score_team1 %></div>
+                    <div class="text-sm text-gray-500">-</div>
+                    <div class="text-xl font-bold"><%= match.score_team2 %></div>
+                  </div>
+
+                  <div class="mt-2 text-sm">
+                    <% if match.winner %>
+                      <span class="text-green-600 font-medium">
+                        <%= match.winner.name %> won
+                      </span>
+                    <% else %>
+                      <span class="text-gray-600 font-medium">Draw</span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="mt-2 text-sm text-gray-600">
+                    Scheduled for <%= match.match_date.strftime("%B %d, %Y at %H:%M") %>
+                  </div>
+                <% end %>
+
+                <div class="mt-2 text-right">
+                  <%= link_to "View details", match_path(match), class: "text-blue-600 hover:text-blue-800 text-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mt-4 text-right">
+            <%= link_to "See all matches", matches_path, class: "text-blue-600 hover:text-blue-800" %>
+          </div>
+        <% else %>
+          <p class="text-gray-600">No matches yet.</p>
+        <% end %>
+      </div>
+
+      <!-- Team Rankings Section -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Team Rankings</h2>
+
+        <% if @teams.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">W</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">L</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">D</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
+              </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+              <% @teams.each_with_index do |team, index| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= index + 1 %></td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <%= link_to team.name, team_path(team), class: "text-blue-600 hover:text-blue-900" %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= team.win_count %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= team.loss_count %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= team.draw_count %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= team.points %></td>
+                </tr>
+              <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 text-right">
+            <%= link_to "See all teams", teams_path, class: "text-blue-600 hover:text-blue-800" %>
+          </div>
+        <% else %>
+          <p class="text-gray-600">No teams yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
