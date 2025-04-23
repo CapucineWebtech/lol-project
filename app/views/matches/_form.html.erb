@@ -13,25 +13,30 @@
 
   <div class="my-5">
     <%= form.label :team1_id %>
-    <%= form.text_field :team1_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": match.errors[:team1_id].none?, "border-red-400 focus:outline-red-600": match.errors[:team1_id].any?}] %>
+    <%= form.collection_select :team1_id, Team.all, :id, :name, { prompt: "Select team 1" }, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
     <%= form.label :team2_id %>
-    <%= form.text_field :team2_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": match.errors[:team2_id].none?, "border-red-400 focus:outline-red-600": match.errors[:team2_id].any?}] %>
+    <%= form.collection_select :team2_id, Team.all, :id, :name, { prompt: "Select team 2" }, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
     <%= form.label :match_date %>
-    <%= form.date_field :match_date, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": match.errors[:match_date].none?, "border-red-400 focus:outline-red-600": match.errors[:match_date].any?}] %>
+    <%= form.datetime_field :match_date, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :score %>
-    <%= form.text_field :score, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": match.errors[:score].none?, "border-red-400 focus:outline-red-600": match.errors[:score].any?}] %>
+    <%= form.label :score_team1, "Score Team 1" %>
+    <%= form.number_field :score_team1, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :score_team2, "Score Team 2" %>
+    <%= form.number_field :score_team2, class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full" %>
   </div>
 
   <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>

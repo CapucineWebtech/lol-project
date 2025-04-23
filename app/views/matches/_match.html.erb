@@ -13,6 +13,17 @@
   </div>
   <div>
     <strong class="block font-medium mb-1">Score:</strong>
-    <%= match.score %>
+    <% if match.score_team1.present? && match.score_team2.present? %>
+      <%= match.score_team1 %> - <%= match.score_team2 %>
+    <% else %>
+      Not played yet
+    <% end %>
   </div>
+
+  <% if match.winner %>
+  <div>
+    <strong class="block font-medium mb-1">Winner:</strong>
+    <%= match.winner.name %>
+  </div>
+  <% end %>
 </div>

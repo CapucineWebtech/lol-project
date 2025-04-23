@@ -19,6 +19,14 @@ class Match < ApplicationRecord
     end
   end
 
+  def score
+    if score_team1.present? && score_team2.present?
+      "#{score_team1} - #{score_team2}"
+    else
+      "Not played yet"
+    end
+  end
+
   def result_text
     return "Match not plated yet" if score_team1.nil? || score_team2.nil?
     winner_team = winner
