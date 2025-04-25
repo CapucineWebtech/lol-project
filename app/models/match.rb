@@ -23,17 +23,17 @@ class Match < ApplicationRecord
     if score_team1.present? && score_team2.present?
       "#{score_team1} - #{score_team2}"
     else
-      "Not played yet"
+      "Pas encore joué"
     end
   end
 
   def result_text
-    return "Match not plated yet" if score_team1.nil? || score_team2.nil?
+    return "Match pas encore joué" if score_team1.nil? || score_team2.nil?
     winner_team = winner
     if winner_team
-      "#{winner_team.name} won (#{score_team1} - #{score_team2})"
+      "#{winner_team.name} a gagné (#{score_team1} - #{score_team2})"
     else
-      "Draw (#{score_team1} - #{score_team2})"
+      "Égalité (#{score_team1} - #{score_team2})"
     end
   end
 
@@ -41,17 +41,17 @@ class Match < ApplicationRecord
 
   def teams_must_be_different
     if team1_id == team2_id
-      errors.add(:team2_id, "cannot be the same as Team 1")
+      errors.add(:team2_id, "ne peut pas être la même que l'équipe 1")
     end
   end
 
   def teams_must_have_players
     if team1 && team1.players.empty?
-      errors.add(:team1_id, "must have at least one player")
+      errors.add(:team1_id, "doit avoir au moins un joueur")
     end
 
     if team2 && team2.players.empty?
-      errors.add(:team2_id, "must have at least one player")
+      errors.add(:team2_id, "doit avoir au moins un joueur")
     end
   end
 end
