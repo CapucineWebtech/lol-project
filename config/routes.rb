@@ -29,12 +29,6 @@ Rails.application.routes.draw do
     end
   end  
 
-  # Dashboard route for admins
-  get 'dashboard', to: 'dashboard#index'
-
-  # Team rankings
-  get 'rankings', to: 'teams#rankings'
-
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end
