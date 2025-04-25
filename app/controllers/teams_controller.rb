@@ -1,4 +1,6 @@
 class TeamsController < ApplicationController
+  before_action :require_login
+  before_action :require_admin, only: %i[new create edit update destroy]
   before_action :set_team, only: %i[ show edit update destroy ]
 
   # GET /teams or /teams.json

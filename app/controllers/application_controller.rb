@@ -24,4 +24,8 @@ class ApplicationController < ActionController::Base
         redirect_to root_path, alert: "Vous n'avez pas accès à cette partie du site."
         end
     end
+
+    def redirect_if_logged_in
+        redirect_to current_user if logged_in?
+      end
 end

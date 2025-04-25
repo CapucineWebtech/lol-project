@@ -1,4 +1,6 @@
 class MatchesController < ApplicationController
+  before_action :require_login
+  before_action :require_admin, only: %i[new create edit update destroy]
   before_action :set_match, only: %i[ show edit update destroy ]
 
   # GET /matches or /matches.json
