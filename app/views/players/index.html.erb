@@ -1,29 +1,95 @@
-<% content_for :title, "Players" %>
+<% content_for :title, "Liste des joueurs" %>
 
-<div class="w-full">
+<div class="w-full max-w-4xl mx-auto mt-10 space-y-6">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 text-green-600 font-medium rounded-md inline-block">
+      <%= notice %>
+    </p>
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Players</h1>
-    <%= link_to "New player", new_player_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="text-3xl font-bold">Liste des joueurs</h1>
+    <% if current_user&.is_admin? %>
+      <%= link_to "Ajouter un joueur", new_player_path, class: "rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium" %>
+    <% end %>
   </div>
 
-  <div id="players" class="min-w-full divide-y divide-gray-200 space-y-5">
+  <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+    <%= form_with url: players_path, method: :get, class: "space-y-4" do |f| %>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div>
+          <%= f.label :name, "Rechercher par nom", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <%= f.text_field :name, value: params[:name], placeholder: "Entrez un nom...", class: "pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+        </div>
+        
+        <div>
+          <%= f.label :team_id, "Filtrer par équipe", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.select :team_id, 
+            Team.all.map { |t| [t.name, t.id] }.unshift(["Toutes les équipes", ""]), 
+            { selected: params[:team_id] }, 
+            { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } 
+          %>
+        </div>
+        
+        <div>
+          <%= f.label :role, "Filtrer par rôle", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.select :role, 
+            [["Tous les rôles", ""], ["Top laner", "Top laner"], ["Jungler", "Jungler"], ["Mid laner", "Mid laner"], ["ADC", "ADC"], ["Support", "Support"]], 
+            { selected: params[:role] }, 
+            { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } 
+          %>
+        </div>
+      </div>
+      
+      <div class="flex justify-end pt-2">
+        <%= link_to "Réinitialiser", players_path, class: "px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 border border-gray-200 font-medium" %>
+        <%= f.submit "Filtrer", class: "ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 font-medium" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow-sm rounded-lg divide-y divide-gray-200">
     <% if @players.any? %>
       <% @players.each do |player| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render player %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", player, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_player_path(player), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", player, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-          </div>
+        <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-4">
+          <%= link_to player_path(player), class: "block w-full group" do %>
+            <div class="w-full sm:w-auto text-center sm:text-left">
+              <p class="text-lg font-medium text-gray-800 group-hover:underline"><%= "#{player.first_name} #{player.last_name}" %></p>
+              <div class="flex flex-wrap items-center gap-2 mt-1">
+                <% role_colors = {
+                  "Top laner" => "bg-red-100 text-red-800",
+                  "Jungler" => "bg-green-100 text-green-800",
+                  "Mid laner" => "bg-blue-100 text-blue-800",
+                  "ADC" => "bg-purple-100 text-purple-800",
+                  "Support" => "bg-yellow-100 text-yellow-800"
+                } %>
+                <span class="px-2 py-1 text-xs font-medium rounded-full <%= role_colors[player.role] || 'bg-gray-100 text-gray-800' %>">
+                  <%= player.role %>
+                </span>
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                  Équipe : <%= player.team&.name || "Aucune" %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+
+          <% if current_user&.is_admin? %>
+            <div class="mt-4 sm:mt-0 flex gap-2 z-10 relative">
+              <%= link_to "Modifier", edit_player_path(player), class: "px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 font-medium" %>
+              <%= button_to "Supprimer", player, method: :delete, class: "px-4 py-2 rounded-md text-white bg-red-600 hover:bg-red-500 font-medium", data: { turbo_confirm: "Supprimer ce joueur ?" } %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No players found.</p>
+      <p class="text-center text-gray-500 py-6">Aucun joueur trouvé.</p>
     <% end %>
   </div>
 </div>

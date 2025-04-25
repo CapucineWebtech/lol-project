@@ -1,15 +1,140 @@
-<% content_for :title, "Showing player" %>
+<% content_for :title, "Fiche joueur" %>
 
-<div class="md:w-2/3 w-full">
+<% role_colors = {
+  "Top laner" => "bg-red-100 text-red-800",
+  "Jungler" => "bg-green-100 text-green-800",
+  "Mid laner" => "bg-blue-100 text-blue-800",
+  "ADC" => "bg-purple-100 text-purple-800",
+  "Support" => "bg-yellow-100 text-yellow-800"
+} %>
+
+<div class="max-w-3xl mx-auto mt-10 space-y-8">
+
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 text-green-600 font-medium rounded-md">
+      <%= notice %>
+    </p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing player</h1>
+  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800">Informations du joueur</h2>
 
-  <%= render @player %>
+    <div>
+      <p class="text-sm font-semibold text-gray-600">Nom complet :</p>
+      <p class="text-lg text-gray-800"><%= @player.full_name %></p>
+    </div>
 
-  <%= link_to "Edit this player", edit_player_path(@player), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to players", players_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this player", @player, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <div>
+      <p class="text-sm font-semibold text-gray-600">Rôle :</p>
+      <span class="inline-block px-3 py-1 text-sm rounded-full font-semibold <%= role_colors[@player.role] %>">
+        <%= @player.role %>
+      </span>
+    </div>
+  </div>
+
+  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800">Équipe</h2>
+
+    <% if @player.team %>
+      <div>
+        <p class="text-sm font-semibold text-gray-600">Nom de l'équipe :</p>
+        <%= link_to @player.team.name, team_path(@player.team), class: "text-black hover:underline font-medium text-lg" %>
+      </div>
+
+      <div>
+        <p class="text-sm font-semibold text-gray-600">Membres :</p>
+        <ul class="mt-2 space-y-1">
+          <% @player.team.players.each do |member| %>
+            <li>
+              <%= link_to member.full_name, player_path(member), class: "text-black hover:underline font-medium" %>
+              <span class="ml-2 inline-block px-2 py-0.5 text-xs rounded-full font-medium <%= role_colors[member.role] %>">
+                <%= member.role %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <p class="text-gray-600 italic">Ce joueur n'est associé à aucune équipe.</p>
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800">Scores de l’équipe</h2>
+
+    <% matches = @player.matches %>
+    <% win_count = @player.win_count %>
+    <% loss_count = matches.count { |m| m.winner && m.winner != @player.team } %>
+
+    <p class="text-gray-700 font-medium">
+      <%= win_count %> victoire<%= 's' if win_count != 1 %> –
+      <%= loss_count %> défaite<%= 's' if loss_count != 1 %>
+    </p>
+
+    <% if matches.any? %>
+      <table class="w-full text-left border-t border-gray-200 mt-4">
+        <thead>
+          <tr class="text-sm font-semibold text-gray-700">
+            <th class="py-2">Date</th>
+            <th class="py-2">Adversaire</th>
+            <th class="py-2">Score</th>
+            <th class="py-2">Résultat</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-100">
+          <% matches.each do |match| %>
+            <% team = @player.team %>
+            <% opponent = match.team1 == team ? match.team2 : match.team1 %>
+            <% team_score = match.team1 == team ? match.score_team1 : match.score_team2 %>
+            <% opponent_score = match.team1 == team ? match.score_team2 : match.score_team1 %>
+            <% is_win = match.winner == team %>
+            <% is_draw = match.winner.nil? && match.score_team1.present? && match.score_team2.present? %>
+            <% is_pending = match.score_team1.nil? || match.score_team2.nil? %>
+
+            <tr>
+              <td class="py-2 text-gray-700"><%= match.match_date.strftime("%d/%m/%Y") %></td>
+              <td class="py-2 text-gray-700"><%= opponent.name %></td>
+              <td class="py-2 text-gray-700">
+                <% if is_pending %>
+                  <span class="italic text-gray-400">À venir</span>
+                <% else %>
+                  <%= team_score %> - <%= opponent_score %>
+                <% end %>
+              </td>
+              <td class="py-2">
+                <% if is_pending %>
+                  <span class="text-gray-400 font-medium">En attente</span>
+                <% elsif is_win %>
+                  <span class="text-green-600 font-semibold">Victoire</span>
+                <% elsif is_draw %>
+                  <span class="text-gray-600 font-semibold">Égalité</span>
+                <% else %>
+                  <span class="text-red-600 font-semibold">Défaite</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="italic text-gray-500">Aucun match pour cette équipe.</p>
+    <% end %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <% if admin? %>
+        <%= link_to "Modifier", edit_player_path(@player),
+            class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 font-medium" %>
+
+        <%= button_to "Supprimer", @player,
+            method: :delete,
+            data: { turbo_confirm: "Supprimer ce joueur ?" },
+            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 font-medium" %>
+      <% end %>
+
+      <%= link_to "Voir tous les joueurs", players_path,
+          class: "px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md font-medium bg-gray-300" %>
+    </div>
+  </div>
 </div>

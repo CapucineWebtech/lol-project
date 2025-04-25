@@ -4,6 +4,21 @@ class PlayersController < ApplicationController
   # GET /players or /players.json
   def index
     @players = Player.all
+    
+    if params[:name].present?
+      search_term = "%#{params[:name]}%"
+      @players = @players.where("LOWER(first_name) LIKE LOWER(?) OR LOWER(last_name) LIKE LOWER(?)", search_term, search_term)
+    end
+    
+    # Filtre par équipe
+    if params[:team_id].present?
+      @players = @players.where(team_id: params[:team_id])
+    end
+    
+    # Filtre par rôle
+    if params[:role].present?
+      @players = @players.where(role: params[:role])
+    end
   end
 
   # GET /players/1 or /players/1.json

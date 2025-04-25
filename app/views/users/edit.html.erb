@@ -3,3 +3,18 @@
 <div class="w-full">
   <%= render "form", user: @user %>
 </div>
+
+<script>
+  function togglePassword(fieldId, button) {
+    const field = document.getElementById(fieldId);
+    const icon = button.querySelector("svg");
+
+    if (field.type === "password") {
+      field.type = "text";
+      icon.classList.add("text-blue-500");
+    } else {
+      field.type = "password";
+      icon.classList.remove("text-blue-500");
+    }
+  }
+</script>
