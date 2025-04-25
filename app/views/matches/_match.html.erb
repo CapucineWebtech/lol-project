@@ -1,29 +1,51 @@
-<div id="<%= dom_id match %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Team1:</strong>
-    <%= match.team1_id %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Team2:</strong>
-    <%= match.team2_id %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Match date:</strong>
-    <%= match.match_date %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Score:</strong>
+<div id="<%= dom_id match %>" class="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition duration-200">
+  <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+    <div class="text-center sm:text-left mb-4 sm:mb-0">
+      <p class="text-sm text-gray-500">
+        <%= match.match_date.strftime("%A, %B %d, %Y at %H:%M") %>
+      </p>
+    </div>
+
     <% if match.score_team1.present? && match.score_team2.present? %>
-      <%= match.score_team1 %> - <%= match.score_team2 %>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        Terminé
+      </span>
     <% else %>
-      Not played yet
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        Prochainement
+      </span>
     <% end %>
   </div>
 
-  <% if match.winner %>
-  <div>
-    <strong class="block font-medium mb-1">Winner:</strong>
-    <%= match.winner.name %>
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-4 my-4">
+    <div class="text-center sm:text-right sm:w-1/3">
+      <div class="text-lg font-bold"><%= Team.find_by(id: match.team1_id)&.name || "Équipe non trouvée" %></div>
+      <% if match.score_team1.present? %>
+        <div class="text-2xl font-extrabold mt-1"><%= match.score_team1 %></div>
+      <% end %>
+    </div>
+
+    <div class="text-center">
+      <% if match.score_team1.present? && match.score_team2.present? %>
+        <div class="text-xl font-bold px-3 py-1 bg-gray-100 rounded-md">VS</div>
+      <% else %>
+        <div class="text-xl font-bold px-3 py-1">VS</div>
+      <% end %>
+    </div>
+
+    <div class="text-center sm:text-left sm:w-1/3">
+      <div class="text-lg font-bold"><%= Team.find_by(id: match.team2_id)&.name || "Équipe non trouvée" %></div>
+      <% if match.score_team2.present? %>
+        <div class="text-2xl font-extrabold mt-1"><%= match.score_team2 %></div>
+      <% end %>
+    </div>
   </div>
+
+  <% if match.winner %>
+    <div class="mt-4 text-center">
+      <div class="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-md">
+        <span class="font-medium">Gagnant :</span> <%= match.winner.name %>
+      </div>
+    </div>
   <% end %>
 </div>
