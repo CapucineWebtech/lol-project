@@ -8,6 +8,10 @@ class Match < ApplicationRecord
   validate :teams_must_be_different
   validate :teams_must_have_players
 
+  def played?
+    score_team1.present? && score_team2.present?
+  end
+
   def winner
     return nil if score_team1.nil? || score_team2.nil?
     if score_team1 > score_team2

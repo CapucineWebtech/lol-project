@@ -91,17 +91,17 @@
             <% is_draw = match.winner.nil? && match.score_team1.present? && match.score_team2.present? %>
             <% is_pending = match.score_team1.nil? || match.score_team2.nil? %>
 
-            <tr>
-              <td class="py-2 text-gray-700"><%= match.match_date.strftime("%d/%m/%Y") %></td>
-              <td class="py-2 text-gray-700"><%= opponent.name %></td>
-              <td class="py-2 text-gray-700">
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='<%= match_path(match) %>'">
+              <td class="py-2 px-2 text-gray-700"><%= match.match_date.strftime("%d/%m/%Y") %></td>
+              <td class="py-2 px-2 text-gray-700"><%= opponent.name %></td>
+              <td class="py-2 px-2 text-gray-700">
                 <% if is_pending %>
                   <span class="italic text-gray-400">À venir</span>
                 <% else %>
                   <%= team_score %> - <%= opponent_score %>
                 <% end %>
               </td>
-              <td class="py-2">
+              <td class="py-2 px-2">
                 <% if is_pending %>
                   <span class="text-gray-400 font-medium">En attente</span>
                 <% elsif is_win %>
@@ -115,6 +115,7 @@
             </tr>
           <% end %>
         </tbody>
+
       </table>
     <% else %>
       <p class="italic text-gray-500">Aucun match pour cette équipe.</p>
