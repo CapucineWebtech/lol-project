@@ -1,4 +1,4 @@
-<% content_for :title, "Matches" %>
+<% content_for :title, "Matchs" %>
 
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <% if notice.present? %>
@@ -17,8 +17,8 @@
   <% end %>
 
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Matches</h1>
-    <%= link_to "New match", new_match_path,
+    <h1 class="text-3xl font-bold text-gray-900">Matchs</h1>
+    <%= link_to "Nouveau Match", new_match_path,
                 class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
   </div>
 
@@ -29,13 +29,13 @@
           <div class="relative">
             <%= render match %>
             <div class="mt-4 flex justify-center space-x-3">
-              <%= link_to "View", match,
+              <%= link_to "Voir", match,
                           class: "inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-              <%= link_to "Edit", edit_match_path(match),
+              <%= link_to "Modifier", edit_match_path(match),
                           class: "inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-              <%= button_to "Delete", match, method: :delete,
+              <%= button_to "Supprimer", match, method: :delete,
                             class: "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
-                            data: { turbo_confirm: "Are you sure?" } %>
+                            data: { turbo_confirm: "Êtes-vous sûr ?" } %>
             </div>
           </div>
         <% end %>
@@ -45,10 +45,10 @@
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No matches found</h3>
-        <p class="mt-1 text-sm text-gray-500">Get started by creating a new match.</p>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun match trouvé</h3>
+        <p class="mt-1 text-sm text-gray-500">Commencez par créer un nouveau match.</p>
         <div class="mt-6">
-          <%= link_to "New match", new_match_path,
+          <%= link_to "Nouveau Match", new_match_path,
                       class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
         </div>
       </div>

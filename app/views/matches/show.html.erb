@@ -18,7 +18,7 @@
 
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">
-      <h1 class="text-2xl font-bold text-gray-800">Match Details</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Détails du Match</h1>
     </div>
 
     <div class="p-6">
@@ -26,14 +26,14 @@
     </div>
 
     <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-wrap gap-3">
-      <%= link_to "Edit this match", edit_match_path(@match),
+      <%= link_to "Modifier ce Match", edit_match_path(@match),
                   class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-      <%= link_to "Back to matches", matches_path,
+      <%= link_to "Retour aux Matchs", matches_path,
                   class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-      <%= button_to "Delete this match", @match, method: :delete,
+      <%= button_to "Supprimer ce Match", @match, method: :delete,
                     class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
                     form_class: "inline",
-                    data: { turbo_confirm: "Are you sure?" } %>
+                    data: { turbo_confirm: "Êtes-vous sûr ?" } %>
     </div>
   </div>
 </div>
