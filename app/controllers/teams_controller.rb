@@ -1,72 +1,82 @@
 class TeamsController < ApplicationController
   before_action :require_login
   before_action :require_admin, only: %i[new create edit update destroy]
-  before_action :set_team, only: %i[ show edit update destroy ]
+  before_action :set_team, only: %i[show edit update destroy]
 
-  # GET /teams or /teams.json
   def index
     @teams = Team.all
   end
 
-  # GET /teams/1 or /teams/1.json
   def show
   end
 
-  # GET /teams/new
   def new
     @team = Team.new
   end
 
-  # GET /teams/1/edit
   def edit
   end
 
-  # POST /teams or /teams.json
   def create
-    @team = Team.new(team_params)
-
+    @team = Team.new(name: team_params[:name])
+    
     respond_to do |format|
       if @team.save
-        format.html { redirect_to @team, notice: "Team was successfully created." }
-        format.json { render :show, status: :created, location: @team }
+        player_ids = params[:team][:player_ids].reject(&:blank?)
+        if player_ids.any?
+          Player.where(id: player_ids).update_all(team_id: @team.id)
+        end
+        format.html { redirect_to @team, notice: "Équipe créée avec succès." }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @team.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PATCH/PUT /teams/1 or /teams/1.json
   def update
     respond_to do |format|
-      if @team.update(team_params)
-        format.html { redirect_to @team, notice: "Team was successfully updated." }
-        format.json { render :show, status: :ok, location: @team }
+      if @team.update(name: team_params[:name])        
+        player_ids = params[:team][:player_ids].reject(&:blank?)
+        if player_ids.any?
+          Player.where(id: player_ids).update_all(team_id: @team.id)
+        end
+        
+        format.html { redirect_to @team, notice: "Équipe mise à jour avec succès." }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @team.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /teams/1 or /teams/1.json
   def destroy
-    @team.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to teams_path, status: :see_other, notice: "Team was successfully destroyed." }
-      format.json { head :no_content }
+    if @team.players.exists?
+      redirect_to edit_team_path(@team), alert: "Merci de retirer tous les joueurs de l'équipe avant de la supprimer."
+    else
+      @team.destroy!
+      redirect_to teams_path, status: :see_other, notice: "Équipe supprimée avec succès."
     end
   end
+  
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_team
-      @team = Team.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def team_params
-      params.require(:team).permit(:name)
+  def set_team
+    @team = Team.find(params[:id])
+  end
+
+  def team_params
+    params.require(:team).permit(:name, player_ids: [])
+  end
+
+  def assign_players
+    new_ids = params[:team][:player_ids].reject(&:blank?).map(&:to_i)
+  
+    @team.players.where.not(id: new_ids).each do |player|
+      player.update(team_id: nil)
     end
+  
+    Player.where(id: new_ids).each do |player|
+      player.update(team_id: @team.id)
+    end
+  end  
 end

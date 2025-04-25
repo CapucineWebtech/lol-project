@@ -1,15 +1,119 @@
-<% content_for :title, "Showing team" %>
+<% content_for :title, "Fiche équipe" %>
 
-<div class="md:w-2/3 w-full">
+<% role_colors = {
+  "Top laner" => "bg-red-100 text-red-800",
+  "Jungler" => "bg-green-100 text-green-800",
+  "Mid laner" => "bg-blue-100 text-blue-800",
+  "ADC" => "bg-purple-100 text-purple-800",
+  "Support" => "bg-yellow-100 text-yellow-800"
+} %>
+
+<div class="max-w-3xl mx-auto mt-10 space-y-8">
+
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+    <p class="py-2 px-3 bg-green-50 text-green-600 font-medium rounded-md">
+      <%= notice %>
+    </p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing team</h1>
+  <!-- Section Équipe -->
+  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800">Équipe</h2>
 
-  <%= render @team %>
+    <div>
+      <p class="text-sm font-semibold text-gray-600">Nom :</p>
+      <p class="text-lg text-gray-800"><%= @team.name %></p>
+    </div>
 
-  <%= link_to "Edit this team", edit_team_path(@team), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to teams", teams_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this team", @team, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <div>
+      <p class="text-sm font-semibold text-gray-600">Joueurs :</p>
+      <% if @team.players.any? %>
+        <ul class="mt-2 space-y-1">
+          <% @team.players.each do |player| %>
+            <li>
+              <%= link_to player.full_name, player_path(player), class: "text-black hover:underline font-medium" %>
+              <span class="ml-2 inline-block px-2 py-0.5 text-xs rounded-full font-medium <%= role_colors[player.role] || 'bg-gray-100 text-gray-800' %>">
+                <%= player.role %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="italic text-gray-500">Aucun joueur dans cette équipe.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Section Matchs -->
+  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
+    <h2 class="text-2xl font-bold text-gray-800">Matchs joués</h2>
+
+    <% matches = Match.where("team1_id = :id OR team2_id = :id", id: @team.id) %>
+
+    <% if matches.any? %>
+      <table class="w-full text-left border-t border-gray-200 mt-4">
+        <thead>
+          <tr class="text-sm font-semibold text-gray-700">
+            <th class="py-2">Date</th>
+            <th class="py-2">Adversaire</th>
+            <th class="py-2">Score</th>
+            <th class="py-2">Résultat</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-100">
+          <% matches.each do |match| %>
+            <% opponent = match.team1 == @team ? match.team2 : match.team1 %>
+            <% team_score = match.team1 == @team ? match.score_team1 : match.score_team2 %>
+            <% opponent_score = match.team1 == @team ? match.score_team2 : match.score_team1 %>
+            <% is_win = match.winner == @team %>
+            <% is_draw = match.winner.nil? && match.score_team1.present? && match.score_team2.present? %>
+            <% is_pending = match.score_team1.nil? || match.score_team2.nil? %>
+
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='<%= match_path(match) %>'">
+              <td class="py-2 px-2 text-gray-700"><%= match.match_date.strftime("%d/%m/%Y") %></td>
+              <td class="py-2 px-2 text-gray-700"><%= opponent.name %></td>
+              <td class="py-2 px-2 text-gray-700">
+                <% if is_pending %>
+                  <span class="italic text-gray-400">À venir</span>
+                <% else %>
+                  <%= team_score %> - <%= opponent_score %>
+                <% end %>
+              </td>
+              <td class="py-2 px-2">
+                <% if is_pending %>
+                  <span class="text-gray-400 font-medium">En attente</span>
+                <% elsif is_win %>
+                  <span class="text-green-600 font-semibold">Victoire</span>
+                <% elsif is_draw %>
+                  <span class="text-gray-600 font-semibold">Égalité</span>
+                <% else %>
+                  <span class="text-red-600 font-semibold">Défaite</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="italic text-gray-500">Aucun match joué par cette équipe.</p>
+    <% end %>
+  </div>
+
+  <!-- Boutons -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <% if current_user&.is_admin? %>
+        <%= link_to "Modifier l'équipe", edit_team_path(@team),
+            class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 font-medium" %>
+
+        <%= button_to "Supprimer l'équipe", @team,
+            method: :delete,
+            data: { turbo_confirm: "Supprimer cette équipe ?" },
+            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 font-medium" %>
+      <% end %>
+
+      <%= link_to "Voir toutes les équipes", teams_path,
+          class: "px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md font-medium bg-gray-300" %>
+    </div>
+  </div>
 </div>

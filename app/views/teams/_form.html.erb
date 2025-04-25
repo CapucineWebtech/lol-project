@@ -1,22 +1,83 @@
-<%= form_with(model: team, class: "contents") do |form| %>
-  <% if team.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(team.errors.count, "error") %> prohibited this team from being saved:</h2>
+<% content_for :title, controller.action_name == "edit" ? "Modification d'une équipe" : "Création d'une équipe" %>
 
-      <ul class="list-disc ml-6">
-        <% team.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<div class="w-full max-w-xl mx-auto bg-white p-8 rounded-lg shadow-sm">
+  <% if flash[:alert].present? %>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 w-full max-w-md">
+      <p class="font-semibold"><%= flash[:alert] %></p>
     </div>
   <% end %>
+  <h1 class="text-2xl font-bold text-center mb-6">
+    <%= controller.action_name == "edit" ? "Modifier l'équipe" : "Créer une équipe" %>
+  </h1>
 
-  <div class="my-5">
-    <%= form.label :name %>
-    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": team.errors[:name].none?, "border-red-400 focus:outline-red-600": team.errors[:name].any?}] %>
-  </div>
+  <%= form_with(model: team, class: "contents") do |form| %>
+    <% if team.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3 mb-4">
+        <h2><%= pluralize(team.errors.count, "erreur") %> empêchent l'enregistrement :</h2>
+        <ul class="list-disc ml-6">
+          <% team.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <div class="mb-4">
+      <%= form.label :name, "Nom de l'équipe", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div class="mb-4 space-y-4">
+      <p class="text-sm text-gray-600 italic">
+        Un joueur ne peut appartenir qu'à une seule équipe. Si vous ajoutez un joueur déjà membre d'une autre équipe, il en sera automatiquement retiré.
+      </p>
+      <p class="text-sm text-gray-600 italic">
+        Pour retirer un joueur, modifiez son profil directement.
+      </p>
+    </div>
+
+    <% assigned_player_ids = (params.dig(:team, :player_ids) || team.players.pluck(:id).map(&:to_s)) %>
+    <% assigned_players = Player.where(id: assigned_player_ids.reject(&:blank?)) %>
+    <% available_players = Player.where.not(id: assigned_players.map(&:id)) %>
+
+    <% selected_ids = [] %>
+    <% selected_ids = Array(params.dig(:team, :player_ids)).compact %>
+    <% 5.times do |i| %>
+      <div class="mb-4">
+        <% if assigned_players[i] %>
+          <div class="flex justify-between items-center border px-4 py-2 rounded-md bg-gray-50">
+            <p class="text-gray-800 font-medium">
+              <%= assigned_players[i].full_name %> — <%= assigned_players[i].role %>
+            </p>
+            <%= link_to "Voir", player_path(assigned_players[i]), class: "text-blue-600 hover:underline text-sm", data: { turbo_confirm: "Les changements non enregistrés seront perdus. Continuer ?" } %>
+          </div>
+        <% else %>
+          <%= label_tag "player_slot_#{i}", "Joueur #{i + 1}", class: "block text-sm font-medium text-gray-700" %>
+    
+          <% already_chosen = selected_ids.take(i) %>
+          <% available_options = available_players.reject { |p| already_chosen.include?(p.id.to_s) } %>
+          <% selected_value = selected_ids[i] %>
+    
+          <%= select_tag "team[player_ids][]",
+              options_from_collection_for_select(available_options, :id, :full_name, selected_value),
+              include_blank: "Sélectionner un joueur",
+              class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="mb-6">
+      <%= form.submit controller.action_name == "edit" ? "Mettre à jour" : "Créer", class: "w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold rounded-md cursor-pointer text-lg" %>
+    </div>
+  <% end %>
+  <div class="mb-6">
+    <%= button_to "Supprimer", team_path(team), method: :delete, data: { turbo_confirm: "Supprimer cette équipe ?" }, class: "text-white w-full py-3 bg-red-600 hover:bg-red-500 text-gray-800 font-bold rounded-md cursor-pointer text-lg" %>
   </div>
-<% end %>
+  <div class="text-center mt-4 text-sm">
+    <%= link_to "Retour aux équipes", teams_path, class: "text-blue-600 hover:underline font-medium" %>
+    <% if controller.action_name == "edit" %>
+      <br>
+      <%= link_to "Voir cette équipe", team_path(team), class: "text-blue-600 hover:underline font-medium" %>
+    <% end %>
+  </div>
+</div>
