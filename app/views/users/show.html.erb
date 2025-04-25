@@ -1,47 +1,130 @@
-<% content_for :title, "Fiche utilisateur" %>
+<% content_for :title, "Profil utilisateur" %>
 
-<div class="max-w-2xl mx-auto mt-10 space-y-6">
-
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
   <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 text-green-600 font-medium rounded-md">
-      <%= notice %>
-    </p>
+    <div class="mb-6 rounded-md bg-green-50 p-4 animate-fade-in-down">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-green-800"><%= notice %></p>
+        </div>
+      </div>
+    </div>
   <% end %>
 
-  <div class="bg-white shadow-sm rounded-lg p-6 space-y-4">
-    <h1 class="text-2xl font-bold text-gray-800">Informations du compte</h1>
-
-    <div>
-      <p class="text-sm font-semibold text-gray-600">Email :</p>
-      <p class="text-lg text-gray-800"><%= @user.email %></p>
+  <!-- Carte principale -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <!-- En-tête avec avatar -->
+    <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center space-x-5">
+        <div class="flex-shrink-0">
+          <div class="relative">
+            <div class="h-20 w-20 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow-inner">
+              <%= @user.email.first.upcase %>
+            </div>
+            <span class="absolute bottom-0 right-0 block h-4 w-4 rounded-full bg-green-400 ring-2 ring-white"></span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900"><%= @user.email.split('@').first.capitalize %></h1>
+          <p class="text-sm font-medium text-gray-500">
+            Membre depuis <%= @user.created_at.strftime("%B %Y") %>
+          </p>
+          <% if @user.is_admin? %>
+            <span class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              Administrateur
+            </span>
+          <% end %>
+        </div>
+      </div>
     </div>
 
-    <% if admin? %>
-      <div>
-        <p class="text-sm font-semibold text-gray-600">Administrateur :</p>
-        <p class="text-lg text-gray-800"><%= @user.is_admin? ? "Oui" : "Non" %></p>
-      </div>
-    <% end %>
+    <!-- Informations utilisateur -->
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-white px-6 py-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500 flex items-center">
+              <svg class="h-5 w-5 text-gray-400 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Adresse email
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 font-medium"><%= @user.email %></dd>
+          </div>
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500 flex items-center">
+              <svg class="h-5 w-5 text-gray-400 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Date d'inscription
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 font-medium"><%= @user.created_at.strftime("%d/%m/%Y") %></dd>
+          </div>
+          <% if admin? %>
+            <div class="sm:col-span-1">
+              <dt class="text-sm font-medium text-gray-500 flex items-center">
+                <svg class="h-5 w-5 text-gray-400 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Statut d'administrateur
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                <% if @user.is_admin? %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    Oui
+                  </span>
+                <% else %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    Non
+                  </span>
+                <% end %>
+              </dd>
+            </div>
+          <% end %>
+        </div>
+      </dl>
+    </div>
   </div>
 
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-      <%= link_to "Modifier", edit_user_path(@user),
-          class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 font-medium" %>
-
-      <%= button_to "Supprimer le compte", @user,
-          method: :delete,
-          class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 font-medium",
-          data: { turbo_confirm: "Supprimer ce compte ?" } %>
+  <!-- Boutons d'action -->
+  <div class="mt-8 flex flex-col sm:flex-row gap-4">
+    <div class="flex-1 flex flex-col sm:flex-row gap-3">
+      <%= link_to edit_user_path(@user), class: "w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Modifier le profil
+      <% end %>
 
       <% if admin? %>
-        <%= link_to "Voir tous les utilisateurs", users_path,
-            class: "px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md font-medium bg-gray-300" %>
+        <%= link_to users_path, class: "w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out" do %>
+          <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          Tous les utilisateurs
+        <% end %>
       <% end %>
     </div>
 
-    <%= button_to "Se déconnecter", logout_path,
-        method: :delete,
-        class: "text-sm text-gray-500 hover:underline mt-2 sm:mt-0 sm:ml-auto" %>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <%= button_to logout_path, method: :delete, class: "w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        Se déconnecter
+      <% end %>
+
+      <%= button_to @user, method: :delete, class: "w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out", data: { turbo_confirm: "Êtes-vous sûr de vouloir supprimer ce compte ? Cette action est irréversible." } do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Supprimer le compte
+      <% end %>
+    </div>
   </div>
 </div>
